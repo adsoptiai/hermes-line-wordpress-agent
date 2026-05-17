@@ -33,9 +33,14 @@ cd "$APP_DIR"
 .venv/bin/python -m pip install --upgrade pip
 .venv/bin/pip install -e .
 chmod 0755 deploy/run-mcp.sh
+chmod 0755 deploy/run-line-gateway.sh
 
 if [[ ! -f "$CONFIG_DIR/env" ]]; then
   install -m 0600 deploy/hermes-wordpress-mcp.env.example "$CONFIG_DIR/env"
+fi
+
+if [[ ! -f "$CONFIG_DIR/line-gateway.env" ]]; then
+  install -m 0600 deploy/hermes-line-gateway.env.example "$CONFIG_DIR/line-gateway.env"
 fi
 
 if [[ ! -f "$CONFIG_DIR/site.profile.yaml" ]]; then
@@ -47,6 +52,8 @@ if [[ ! -f "$CONFIG_DIR/policy.yaml" ]]; then
 fi
 
 install -m 0644 deploy/hermes-mcp-config.vm.example.json "$CONFIG_DIR/hermes-mcp-config.json"
+install -m 0644 deploy/hermes-line-gateway.service.example \
+  "$CONFIG_DIR/hermes-line-gateway.service.example"
 
 if [[ -d "$WP_DIR/wp-content/plugins" ]]; then
   mkdir -p "$WP_DIR/wp-content/plugins/hermes-agent-bridge"
@@ -75,7 +82,9 @@ Config directory:
 Next steps:
   1. Edit $CONFIG_DIR/env with WordPress credentials and bridge token.
   2. Add $CONFIG_DIR/hermes-mcp-config.json to Hermes Agent's MCP config.
-  3. Restart the Hermes Agent/LINE gateway process.
+  3. Edit $CONFIG_DIR/line-gateway.env with LINE credentials and allowlists.
+  4. Install $CONFIG_DIR/hermes-line-gateway.service.example as a systemd service if needed.
+  5. Restart the Hermes Agent/LINE gateway process.
 
 Smoke test:
   set -a && . $CONFIG_DIR/env && set +a

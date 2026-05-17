@@ -3,6 +3,8 @@
 Reusable framework for operating WordPress sites from Hermes Agent through LINE:
 
 - LINE messages are handled by Hermes Agent's LINE gateway.
+- This repo includes a small LINE webhook gateway for deployments where Hermes Agent does not
+  already provide a LINE adapter.
 - WordPress operations are exposed as MCP tools.
 - SEO article, image post, and editor workflows are packaged as skills.
 - Publish, delete, homepage, and SEO-setting changes can require explicit approval.
@@ -46,6 +48,21 @@ Register the MCP server in your Hermes or MCP client config:
     }
   }
 }
+```
+
+Run the optional LINE webhook gateway:
+
+```bash
+export LINE_CHANNEL_SECRET=...
+export LINE_CHANNEL_ACCESS_TOKEN=...
+export HERMES_TOOLSETS=wordpress
+hermes-line-gateway
+```
+
+Webhook endpoint:
+
+```text
+POST /line/webhook
 ```
 
 ## What Goes Where

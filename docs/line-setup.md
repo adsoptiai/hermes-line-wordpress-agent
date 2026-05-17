@@ -1,13 +1,14 @@
 # LINE Setup
 
-Hermes Agent should own the LINE gateway. This framework only provides the WordPress tools and
-workflow guidance that Hermes calls after a LINE message is accepted.
+Hermes Agent can own the LINE gateway directly. If your Hermes install does not include a LINE
+adapter, this framework provides a small FastAPI gateway that accepts LINE webhooks, verifies the
+LINE signature, invokes Hermes Agent, and returns the result through LINE.
 
 ## Recommended Flow
 
 ```text
 LINE webhook
-  -> Hermes LINE adapter
+  -> Hermes LINE adapter or hermes-line-gateway
   -> allowed user/group check
   -> Hermes Agent session
   -> WordPress MCP tools
@@ -15,14 +16,40 @@ LINE webhook
 
 ## Environment
 
-Keep LINE secrets outside this repo:
+Keep LINE secrets outside this repo. On a VM, use
+`/etc/hermes-line-wordpress-agent/line-gateway.env`:
 
 ```env
 LINE_CHANNEL_SECRET=
 LINE_CHANNEL_ACCESS_TOKEN=
 LINE_ALLOWED_USER_IDS=
 LINE_ALLOWED_GROUP_IDS=
+LINE_ALLOWED_ROOM_IDS=
+LINE_REQUIRE_ALLOWLIST=true
+LINE_REPLY_MODE=ack_then_push
+
+HERMES_BIN=/home/ubuntu/.local/bin/hermes
+HERMES_MODEL=kimi-k2.6:cloud
+HERMES_PROVIDER=custom
+HERMES_TOOLSETS=wordpress
+HERMES_WORKDIR=/home/ubuntu
 ```
+
+## Run Locally
+
+```bash
+set -a && . .env && set +a
+hermes-line-gateway
+```
+
+The default webhook URL is:
+
+```text
+https://your-domain.example.com/line/webhook
+```
+
+For setup, send `/whoami` to the LINE Official Account. The gateway replies with the LINE
+`userId`, `groupId`, or `roomId` that you can place in the allowlist.
 
 ## UX Rules
 
@@ -40,3 +67,14 @@ Every Monday at 09:00, generate one draft article about data engineering.
 Generate a featured image for post 123 and upload it to WordPress.
 ```
 
+## Notes From LINE Messaging API
+
+- Verify `x-line-signature` against the raw request body before parsing JSON.
+- Reply messages use the `replyToken` received from a webhook event.
+- Long-running Hermes tasks should use `LINE_REPLY_MODE=ack_then_push`: reply immediately with
+  the token, then push the final result when Hermes finishes.
+
+Reference:
+
+- LINE webhook signature verification: https://developers.line.biz/en/docs/messaging-api/verify-webhook-signature/
+- LINE reply and push messages: https://developers.line.biz/en/docs/messaging-api/sending-messages/

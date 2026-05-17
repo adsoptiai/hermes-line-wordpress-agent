@@ -16,6 +16,7 @@ config. It should not be exposed as a public HTTP service.
 
 /etc/hermes-line-wordpress-agent/
   env
+  line-gateway.env
   site.profile.yaml
   policy.yaml
   hermes-mcp-config.json
@@ -64,6 +65,47 @@ The config uses `/opt/hermes-line-wordpress-agent/deploy/run-mcp.sh`, which load
 `/etc/hermes-line-wordpress-agent/env` before starting the stdio MCP server.
 
 Restart Hermes/LINE gateway after updating the MCP config.
+
+## LINE Gateway Service
+
+The included gateway is optional. Use it when Hermes Agent does not already provide a LINE adapter.
+
+Edit the private LINE env file:
+
+```bash
+sudo nano /etc/hermes-line-wordpress-agent/line-gateway.env
+sudo chmod 600 /etc/hermes-line-wordpress-agent/line-gateway.env
+```
+
+The systemd unit reads this file before switching to the service user, so mode `0600` is fine for
+the LINE gateway.
+
+Install the example service:
+
+```bash
+sudo cp /etc/hermes-line-wordpress-agent/hermes-line-gateway.service.example \
+  /etc/systemd/system/hermes-line-gateway.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now hermes-line-gateway
+```
+
+Expose the webhook through Nginx:
+
+```nginx
+location /line/webhook {
+    proxy_pass http://127.0.0.1:8787/line/webhook;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+Set the LINE Developers Console webhook URL to:
+
+```text
+https://your-domain.example.com/line/webhook
+```
 
 ## Nginx And Application Passwords
 
