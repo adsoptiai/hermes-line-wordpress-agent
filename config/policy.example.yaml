@@ -1,0 +1,33 @@
+principals:
+  admins:
+    line_user_ids: []
+    line_group_ids: []
+  editors:
+    line_user_ids: []
+    line_group_ids: []
+
+tools:
+  read:
+    - wp_health
+    - wp_get_post
+    - wp_search_posts
+    - wp_get_preview_url
+  write:
+    - wp_create_post
+    - wp_update_post
+    - wp_upload_media
+    - wp_set_featured_image
+    - wp_set_seo_meta
+  destructive:
+    - wp_delete_post
+
+approval:
+  always_required:
+    - wp_schedule_post
+    - wp_publish_post
+    - wp_delete_post
+    - wp_update_homepage
+    - wp_set_seo_meta
+  default_publish_status: draft
+  allow_auto_publish: false
+

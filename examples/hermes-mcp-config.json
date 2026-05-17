@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "wordpress": {
+      "command": "hermes-wp-mcp",
+      "env": {
+        "WORDPRESS_BASE_URL": "https://cms.example.com",
+        "WORDPRESS_USERNAME": "editor",
+        "WORDPRESS_APP_PASSWORD": "xxxx xxxx xxxx xxxx xxxx xxxx",
+        "WORDPRESS_BRIDGE_TOKEN": "optional-shared-token",
+        "SITE_PROFILE_PATH": "config/site.profile.example.yaml",
+        "POLICY_PATH": "config/policy.example.yaml"
+      }
+    }
+  }
+}
+

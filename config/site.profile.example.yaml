@@ -1,0 +1,37 @@
+site:
+  slug: example-site
+  name: Example Site
+  public_url: https://www.example.com
+  wordpress_base_url: ${WORDPRESS_BASE_URL}
+  timezone: Asia/Taipei
+
+content:
+  default_status: draft
+  default_author: ${WP_DEFAULT_AUTHOR}
+  default_categories:
+    - Blog
+  default_tags:
+    - AI
+  collections:
+    blog:
+      rest_type: posts
+      route_prefix: /blog
+    pages:
+      rest_type: pages
+      route_prefix: /
+
+seo:
+  title_max_chars: 60
+  description_max_chars: 155
+  require_focus_keyword: true
+  internal_link_minimum: 2
+  image_alt_required: true
+
+approval:
+  require_for:
+    - publish
+    - delete
+    - homepage_update
+    - seo_settings_update
+    - bulk_update
+

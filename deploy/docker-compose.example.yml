@@ -1,0 +1,15 @@
+services:
+  wordpress-mcp:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sh -c "pip install -e . && hermes-wp-mcp"
+    environment:
+      WORDPRESS_BASE_URL: ${WORDPRESS_BASE_URL}
+      WORDPRESS_USERNAME: ${WORDPRESS_USERNAME}
+      WORDPRESS_APP_PASSWORD: ${WORDPRESS_APP_PASSWORD}
+      WORDPRESS_BRIDGE_TOKEN: ${WORDPRESS_BRIDGE_TOKEN}
+      SITE_PROFILE_PATH: ${SITE_PROFILE_PATH:-config/site.profile.example.yaml}
+      POLICY_PATH: ${POLICY_PATH:-config/policy.example.yaml}
+
