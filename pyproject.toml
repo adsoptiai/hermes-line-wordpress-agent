@@ -7,7 +7,7 @@ name = "hermes-line-wordpress-agent"
 version = "0.1.0"
 description = "Reusable Hermes Agent toolkit for LINE-operated WordPress publishing, SEO, media generation, and approval workflows."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Hermes LINE WordPress Agent contributors" }]
 dependencies = [
@@ -34,5 +34,4 @@ where = ["src"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
-
+target-version = "py310"
