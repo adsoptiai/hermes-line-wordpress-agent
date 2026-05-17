@@ -41,6 +41,12 @@ sudo nano /etc/hermes-line-wordpress-agent/env
 sudo chmod 600 /etc/hermes-line-wordpress-agent/env
 ```
 
+WordPress Application Passwords usually contain spaces, so quote them:
+
+```env
+WORDPRESS_APP_PASSWORD="xxxx xxxx xxxx xxxx xxxx xxxx"
+```
+
 Copy or create the private site profile and policy:
 
 ```bash
@@ -58,6 +64,26 @@ The config uses `/opt/hermes-line-wordpress-agent/deploy/run-mcp.sh`, which load
 `/etc/hermes-line-wordpress-agent/env` before starting the stdio MCP server.
 
 Restart Hermes/LINE gateway after updating the MCP config.
+
+## Nginx And Application Passwords
+
+When WordPress runs behind Nginx/PHP-FPM and HTTPS is terminated by a proxy or CDN, WordPress may
+not see the request as SSL. Application Password authentication can then fail with `rest_not_logged_in`.
+
+The WordPress PHP-FPM location should pass both headers:
+
+```nginx
+location ~ \.php$ {
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param HTTPS on;
+    fastcgi_param HTTP_AUTHORIZATION $http_authorization;
+    include fastcgi_params;
+}
+```
+
+Run `nginx -t` before reloading Nginx.
 
 ## Smoke Tests
 

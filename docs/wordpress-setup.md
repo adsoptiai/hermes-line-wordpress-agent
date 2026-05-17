@@ -10,7 +10,7 @@ Use these environment variables:
 ```env
 WORDPRESS_BASE_URL=https://cms.example.com
 WORDPRESS_USERNAME=editor
-WORDPRESS_APP_PASSWORD=xxxx xxxx xxxx xxxx xxxx xxxx
+WORDPRESS_APP_PASSWORD="xxxx xxxx xxxx xxxx xxxx xxxx"
 ```
 
 ## REST API
@@ -23,6 +23,9 @@ The MCP server uses core WordPress REST endpoints:
 - `/wp-json/wp/v2/users/me`
 
 Custom post types must have `show_in_rest` enabled.
+
+If REST requests using Application Passwords return `rest_not_logged_in`, check that Nginx/PHP-FPM
+passes `HTTP_AUTHORIZATION` to WordPress and that WordPress sees the request as HTTPS.
 
 ## SEO Meta
 
@@ -37,4 +40,3 @@ POST /wp-json/hermes-agent/v1/seo-meta/<post_id>
 ```
 
 Protect it with both WordPress Application Password auth and `WORDPRESS_BRIDGE_TOKEN`.
-
