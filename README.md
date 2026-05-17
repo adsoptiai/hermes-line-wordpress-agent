@@ -67,21 +67,21 @@ Private/local repo:
 - Publishing schedule
 - Client-specific rules
 
-## Big Data Year Integration
+## Private Site Integration
 
 Create a private site config outside Git, for example:
 
 ```bash
-mkdir -p .local/bigdatayear
-cp config/site.profile.example.yaml .local/bigdatayear/site.profile.yaml
-cp config/policy.example.yaml .local/bigdatayear/policy.yaml
+mkdir -p .local/my-site
+cp config/site.profile.example.yaml .local/my-site/site.profile.yaml
+cp config/policy.example.yaml .local/my-site/policy.yaml
 ```
 
 Then set:
 
 ```bash
-SITE_PROFILE_PATH=.local/bigdatayear/site.profile.yaml
-POLICY_PATH=.local/bigdatayear/policy.yaml
+SITE_PROFILE_PATH=.local/my-site/site.profile.yaml
+POLICY_PATH=.local/my-site/policy.yaml
 ```
 
 The `.local/` directory is ignored by this repo.
@@ -108,4 +108,4 @@ The MCP server exposes:
 - [WordPress setup](docs/wordpress-setup.md)
 - [Scheduling](docs/scheduling.md)
 - [Security](docs/security.md)
-
+- [VM deployment](docs/vm-deployment.md)

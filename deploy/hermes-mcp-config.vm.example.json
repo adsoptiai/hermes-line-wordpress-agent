@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "wordpress": {
+      "command": "/opt/hermes-line-wordpress-agent/deploy/run-mcp.sh",
+      "env": {
+        "ENV_FILE": "/etc/hermes-line-wordpress-agent/env",
+        "APP_DIR": "/opt/hermes-line-wordpress-agent"
+      }
+    }
+  }
+}

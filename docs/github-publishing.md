@@ -21,7 +21,7 @@ git push -u origin main
 
 ```bash
 git status --short
-git check-ignore -v .local/bigdatayear/site.profile.yaml
+git check-ignore -v .local/my-site/site.profile.yaml
 python -m compileall src
 ```
 
@@ -32,4 +32,3 @@ Confirm the staged or committed files do not include:
 - WordPress credentials
 - LINE user IDs or group IDs
 - Site-specific SEO strategy
-
