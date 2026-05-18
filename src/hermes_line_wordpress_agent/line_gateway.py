@@ -17,7 +17,9 @@ from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Request
 
 LINE_REPLY_ENDPOINT = "https://api.line.me/v2/bot/message/reply"
 LINE_PUSH_ENDPOINT = "https://api.line.me/v2/bot/message/push"
+LINE_LOADING_ENDPOINT = "https://api.line.me/v2/bot/chat/loading/start"
 LINE_TEXT_LIMIT = 5000
+LINE_LOADING_SECONDS = {5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60}
 
 
 def _csv(name: str) -> set[str]:
@@ -43,6 +45,9 @@ class GatewaySettings:
     reply_mode: str
     ack_message: str
     unauthorized_message: str
+    loading_enabled: bool
+    loading_seconds: int
+    loading_skip_ack: bool
     hermes_bin: str
     hermes_model: str
     hermes_provider: str
@@ -67,6 +72,9 @@ class GatewaySettings:
 
         timeout = float(os.getenv("HERMES_TIMEOUT_SECONDS", "300"))
         prefix = os.getenv("HERMES_PREFIX_PROMPT", DEFAULT_PREFIX_PROMPT).strip()
+        loading_seconds = int(os.getenv("LINE_LOADING_SECONDS", "60"))
+        if loading_seconds not in LINE_LOADING_SECONDS:
+            raise RuntimeError("LINE_LOADING_SECONDS must be one of 5, 10, ..., 60")
 
         return cls(
             line_channel_secret=secret,
@@ -81,6 +89,9 @@ class GatewaySettings:
                 "LINE_UNAUTHORIZED_MESSAGE",
                 "This LINE account is not authorized.",
             ),
+            loading_enabled=_bool_env("LINE_LOADING_ENABLED", default=True),
+            loading_seconds=loading_seconds,
+            loading_skip_ack=_bool_env("LINE_LOADING_SKIP_ACK", default=True),
             hermes_bin=os.getenv("HERMES_BIN", "hermes"),
             hermes_model=os.getenv("HERMES_MODEL", ""),
             hermes_provider=os.getenv("HERMES_PROVIDER", ""),
@@ -204,6 +215,23 @@ async def push_text(settings: GatewaySettings, to: str, text: str) -> None:
     await line_post(settings, LINE_PUSH_ENDPOINT, {"to": to, "messages": text_messages(text)})
 
 
+async def start_loading(settings: GatewaySettings, source: dict[str, Any]) -> bool:
+    if not settings.loading_enabled or source.get("type") != "user":
+        return False
+    user_id = source.get("userId")
+    if not user_id:
+        return False
+    try:
+        await line_post(
+            settings,
+            LINE_LOADING_ENDPOINT,
+            {"chatId": user_id, "loadingSeconds": settings.loading_seconds},
+        )
+    except httpx.HTTPError:
+        return False
+    return True
+
+
 async def run_hermes(settings: GatewaySettings, text: str, source: dict[str, Any]) -> str:
     prompt = build_prompt(settings, text, source)
     argv = [settings.hermes_bin, "-z", prompt]
@@ -302,11 +330,13 @@ async def line_webhook(
 
         if settings.reply_mode == "reply":
             if reply_token:
+                await start_loading(settings, source)
                 result = await run_hermes(settings, text, source)
                 await reply_text(settings, reply_token, result)
             continue
 
-        if reply_token:
+        loading_started = await start_loading(settings, source)
+        if reply_token and not (loading_started and settings.loading_skip_ack):
             await reply_text(settings, reply_token, settings.ack_message)
         background_tasks.add_task(process_event, settings, event)
 

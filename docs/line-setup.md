@@ -27,6 +27,9 @@ LINE_ALLOWED_GROUP_IDS=
 LINE_ALLOWED_ROOM_IDS=
 LINE_REQUIRE_ALLOWLIST=true
 LINE_REPLY_MODE=ack_then_push
+LINE_LOADING_ENABLED=true
+LINE_LOADING_SECONDS=60
+LINE_LOADING_SKIP_ACK=true
 
 HERMES_BIN=/home/ubuntu/.local/bin/hermes
 HERMES_MODEL=kimi-k2.6:cloud
@@ -73,6 +76,10 @@ Generate a featured image for post 123 and upload it to WordPress.
 - Reply messages use the `replyToken` received from a webhook event.
 - Long-running Hermes tasks should use `LINE_REPLY_MODE=ack_then_push`: reply immediately with
   the token, then push the final result when Hermes finishes.
+- Loading animation uses `POST /v2/bot/chat/loading/start`. LINE only displays it in one-on-one
+  chats, not group chats or multi-person chats. If `LINE_LOADING_SKIP_ACK=true`, the gateway skips
+  the immediate ack message in one-on-one chats so the loading animation stays visible until the
+  final push message arrives.
 
 Reference:
 
